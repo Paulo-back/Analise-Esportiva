@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 import { afterAll, beforeAll } from "vitest";
 import { pool } from "@/lib/db";
 
