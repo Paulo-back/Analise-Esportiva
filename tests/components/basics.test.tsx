@@ -40,6 +40,19 @@ describe("DimensionScores", () => {
     expect(screen.getByText("66")).toBeInTheDocument();
     expect(screen.getByText("—")).toBeInTheDocument();
   });
+
+  it("tem um botão de ajuda por dimensão explicando o cálculo", () => {
+    render(
+      <DimensionScores
+        scores={{ attack: 66, defense: 91, intensity: null, set_piece: 79, discipline: 19 }}
+      />
+    );
+    const button = screen.getByRole("button", { name: "Como é calculado: Ataque" });
+    const tooltipId = button.getAttribute("aria-describedby");
+    expect(tooltipId).toBeTruthy();
+    expect(document.getElementById(tooltipId as string)).toHaveTextContent(/gols pró/i);
+    expect(screen.getAllByRole("button", { name: /^Como é calculado:/ })).toHaveLength(5);
+  });
 });
 
 describe("MetricList", () => {

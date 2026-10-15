@@ -19,6 +19,21 @@ export const DIMENSION_LABELS: Record<Dimension, string> = {
   style: "Estilo",
 };
 
+// Texto do "!" de cada nota; manter em sincronia com METRICS em pipeline/team_profiles.py.
+export const DIMENSION_HELP: Record<JudgedDimension, string> = {
+  attack:
+    "Média dos percentis de gols pró, chutes, chutes no gol, chutes de dentro da área, conversão, passes-chave, dribles certos e pênaltis sofridos.",
+  defense:
+    "Média dos percentis de gols sofridos, chutes no gol sofridos, vezes driblado, pênaltis cometidos, jogos sem sofrer gol, desarmes + interceptações, bloqueios e defesas do goleiro. Onde menos é melhor, a escala é invertida.",
+  intensity: "Percentil da porcentagem de duelos ganhos.",
+  set_piece: "Percentil de escanteios por jogo.",
+  discipline:
+    "Média dos percentis de faltas, amarelos e vermelhos. Menos é melhor: quem comete menos fica com nota maior.",
+};
+
+export const PERCENTILE_HELP =
+  "Percentil = posição entre os times da mesma liga (0 a 100; 50 é a mediana). Só entram métricas com pelo menos 5 jogos.";
+
 type MetricKind = "count" | "mean" | "pct";
 
 // featured = aparece sem precisar expandir "ver todas" no painel do time.
