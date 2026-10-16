@@ -8,7 +8,7 @@ import { RankingList, topByMetric } from "@/components/RankingList";
 import { StandingsTable } from "@/components/StandingsTable";
 import { StrengthHeatmap } from "@/components/StrengthHeatmap";
 import { UpdatedAt } from "@/components/UpdatedAt";
-import { DIMENSION_LABELS, JUDGED_DIMENSIONS, dimensionScores, formatMonth, formatNumber, standingsBadge } from "@/lib/profile";
+import { DIMENSION_LABELS, JUDGED_DIMENSIONS, dimensionScores, formatMonth, formatNumber, standingsHighlights } from "@/lib/profile";
 import {
   getComputedAt, getLeagueGoalsByMonth, getLeagueKpis, getLeagueProfiles, getProfileLeague, getProfileLeagues,
   getStandings,
@@ -38,7 +38,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
   ]);
 
   const scored = profiles.map((p) => ({ ...p, scores: dimensionScores(p.rows) }));
-  const badges = Object.fromEntries(scored.map((p) => [p.teamId, standingsBadge(p.scores)]));
+  const highlights = Object.fromEntries(scored.map((p) => [p.teamId, standingsHighlights(p.scores)]));
   const heatmapOrder = new Map(standings.map((s) => [s.teamId, s.position]));
   const heatmapTeams = [...scored].sort(
     (a, b) => (heatmapOrder.get(a.teamId) ?? 999) - (heatmapOrder.get(b.teamId) ?? 999)
@@ -61,22 +61,29 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
         <div className="w-full lg:ml-auto lg:w-auto"><LeaguePills leagues={leagues} activeId={league.id} /></div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-4">
-        <div className="grid gap-4 sm:grid-cols-3 lg:col-span-3">
-          <KpiCard title="Partidas" value={formatNumber(kpis.matches, 0)} />
-          <KpiCard title="Gols" value={formatNumber(kpis.goals, 0)} />
-          <KpiCard title="Média de gols" value={kpis.avgGoals === null ? "—" : formatNumber(kpis.avgGoals, 2)} />
-          <Card title="Mapa de forças" subtitle="nota por dimensão (verde ≥ 75 · vermelho ≤ 25)" className="sm:col-span-3">
-            <StrengthHeatmap teams={heatmapTeams} />
-          </Card>
-          <Card title="Gols por mês" subtitle="total de gols da liga" className="sm:col-span-3">
-            <MonthlyGoalsChart series={months.map((m) => ({ label: formatMonth(m.month), primary: m.goals }))} />
-          </Card>
-        </div>
-        <Card title="Classificação" subtitle="com destaque de força/fraqueza" className="lg:row-span-2">
-          <StandingsTable rows={standings} badges={badges} />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <KpiCard title="Partidas" value={formatNumber(kpis.matches, 0)} />
+        <KpiCard title="Gols" value={formatNumber(kpis.goals, 0)} />
+        <KpiCard title="Média de gols" value={kpis.avgGoals === null ? "—" : formatNumber(kpis.avgGoals, 2)} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* min-w-0: sem isso o item do grid não encolhe e a tabela empurra a página no celular */}
+        <Card
+          className="min-w-0"
+          title="Mapa de forças"
+          subtitle="nota por dimensão · verde ≥ 75 · verde claro 60–74 · vermelho claro 26–39 · vermelho ≤ 25"
+        >
+          <StrengthHeatmap teams={heatmapTeams} />
+        </Card>
+        <Card className="min-w-0" title="Classificação" subtitle="com a melhor e a pior dimensão de cada time">
+          <StandingsTable rows={standings} highlights={highlights} />
         </Card>
       </div>
+
+      <Card title="Gols por mês" subtitle="total de gols da liga">
+        <MonthlyGoalsChart series={months.map((m) => ({ label: formatMonth(m.month), primary: m.goals }))} />
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card title="Melhores ataques" subtitle="gols por jogo (total)">

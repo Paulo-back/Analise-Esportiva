@@ -35,17 +35,23 @@ describe("RankingList", () => {
 });
 
 describe("StandingsTable", () => {
-  it("mostra selo da dimensão", () => {
+  it("mostra a melhor e a pior dimensão com a nota", () => {
     render(
       <StandingsTable
         rows={[{
           teamId: 1, teamName: "Palmeiras", teamLogoUrl: null, position: 1, points: 56, played: 27,
           wins: 17, draws: 5, losses: 5, goalsFor: 48, goalsAgainst: 17, goalDiff: 31,
         }]}
-        badges={{ 1: { dimension: "defense", kind: "strong" } }}
+        highlights={{ 1: {
+          best: { dimension: "defense", score: 91, tier: "strong" },
+          worst: { dimension: "set_piece", score: 36.4, tier: "poor" },
+        } }}
       />
     );
-    expect(screen.getByText("Defesa")).toBeInTheDocument();
+    // Renderizado 2x: abaixo do nome (celular) e na coluna própria (sm+); o CSS esconde um deles.
+    for (const text of ["Defesa", "91", "Bola parada", "36"]) {
+      expect(screen.getAllByText(text)).toHaveLength(2);
+    }
     expect(screen.getByText("+31")).toBeInTheDocument();
   });
 });

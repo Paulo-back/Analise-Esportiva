@@ -2,6 +2,9 @@ import type { Dimension, JudgedDimension, MetricRow, Venue } from "@/lib/types";
 
 export const STRONG_PERCENTILE = 75;
 export const WEAK_PERCENTILE = 25;
+// Faixas intermediárias da nota por dimensão (mapa de forças e destaque da classificação).
+export const GOOD_PERCENTILE = 60;
+export const POOR_PERCENTILE = 40;
 export const MIN_GAMES = 5;
 
 export const VENUE_LABELS: Record<Venue, string> = { all: "Geral", home: "Casa", away: "Fora" };
@@ -99,18 +102,32 @@ export function strengthsAndWeaknesses(rows: MetricRow[]) {
   return { strengths, weaknesses };
 }
 
-export function standingsBadge(
+export type ScoreTier = "strong" | "good" | "neutral" | "poor" | "weak";
+
+export function scoreTier(score: number | null): ScoreTier | null {
+  if (score === null) return null;
+  if (score >= STRONG_PERCENTILE) return "strong";
+  if (score >= GOOD_PERCENTILE) return "good";
+  if (score <= WEAK_PERCENTILE) return "weak";
+  if (score < POOR_PERCENTILE) return "poor";
+  return "neutral";
+}
+
+export type DimensionHighlight = { dimension: JudgedDimension; score: number; tier: ScoreTier };
+
+// Melhor e pior dimensão do time, sempre (mesmo no meio da escala); a faixa diz o quanto destacar.
+export function standingsHighlights(
   scores: DimensionScores
-): { dimension: JudgedDimension; kind: "strong" | "weak" } | null {
+): { best: DimensionHighlight; worst: DimensionHighlight | null } | null {
   const entries = JUDGED_DIMENSIONS
     .map((d) => [d, scores[d]] as const)
     .filter((e): e is readonly [JudgedDimension, number] => e[1] !== null);
   if (!entries.length) return null;
   const best = entries.reduce((a, b) => (b[1] > a[1] ? b : a));
-  if (best[1] >= STRONG_PERCENTILE) return { dimension: best[0], kind: "strong" };
   const worst = entries.reduce((a, b) => (b[1] < a[1] ? b : a));
-  if (worst[1] <= WEAK_PERCENTILE) return { dimension: worst[0], kind: "weak" };
-  return null;
+  const toHighlight = ([dimension, score]: readonly [JudgedDimension, number]) =>
+    ({ dimension, score, tier: scoreTier(score) as ScoreTier });
+  return { best: toHighlight(best), worst: entries.length > 1 ? toHighlight(worst) : null };
 }
 
 export function hasEnoughSample(rows: MetricRow[]): boolean {

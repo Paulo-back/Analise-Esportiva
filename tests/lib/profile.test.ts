@@ -7,7 +7,8 @@ import {
   formatMetric,
   formatMonth,
   hasEnoughSample,
-  standingsBadge,
+  scoreTier,
+  standingsHighlights,
   strengthsAndWeaknesses,
 } from "@/lib/profile";
 import type { MetricRow } from "@/lib/types";
@@ -71,20 +72,40 @@ describe("strengthsAndWeaknesses", () => {
   });
 });
 
-describe("standingsBadge", () => {
-  it("prefere a dimensão mais forte quando >= 75", () => {
-    expect(
-      standingsBadge({ attack: 80, defense: 91, intensity: 50, set_piece: 10, discipline: 40 })
-    ).toEqual({ dimension: "defense", kind: "strong" });
+describe("scoreTier", () => {
+  it("divide a nota em 5 faixas, com os cortes de forte/fraco inclusivos", () => {
+    expect([75, 74, 60, 59, 40, 39, 26, 25, 0].map(scoreTier)).toEqual([
+      "strong", "good", "good", "neutral", "neutral", "poor", "poor", "weak", "weak",
+    ]);
+    expect(scoreTier(null)).toBeNull();
   });
-  it("cai para a mais fraca quando nenhuma é forte", () => {
+});
+
+describe("standingsHighlights", () => {
+  it("devolve a melhor e a pior dimensão com nota e faixa, mesmo no meio da escala", () => {
     expect(
-      standingsBadge({ attack: 60, defense: 50, intensity: 22, set_piece: 30, discipline: 40 })
-    ).toEqual({ dimension: "intensity", kind: "weak" });
+      standingsHighlights({ attack: 51, defense: 39, intensity: 68, set_piece: 58, discipline: 36 })
+    ).toEqual({
+      best: { dimension: "intensity", score: 68, tier: "good" },
+      worst: { dimension: "discipline", score: 36, tier: "poor" },
+    });
   });
-  it("sem selo quando nada passa dos cortes", () => {
+  it("ignora dimensões sem nota", () => {
     expect(
-      standingsBadge({ attack: 60, defense: 50, intensity: null, set_piece: 30, discipline: 40 })
+      standingsHighlights({ attack: 80, defense: null, intensity: 50, set_piece: 10, discipline: null })
+    ).toEqual({
+      best: { dimension: "attack", score: 80, tier: "strong" },
+      worst: { dimension: "set_piece", score: 10, tier: "weak" },
+    });
+  });
+  it("só uma dimensão com nota: sem pior, para não repetir a mesma", () => {
+    expect(
+      standingsHighlights({ attack: 70, defense: null, intensity: null, set_piece: null, discipline: null })
+    ).toEqual({ best: { dimension: "attack", score: 70, tier: "good" }, worst: null });
+  });
+  it("nenhuma nota: null", () => {
+    expect(
+      standingsHighlights({ attack: null, defense: null, intensity: null, set_piece: null, discipline: null })
     ).toBeNull();
   });
 });
