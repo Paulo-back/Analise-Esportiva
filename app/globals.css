@@ -29,16 +29,6 @@
   --color-tier-1-fg: #ffffff;
   --font-sans: var(--font-barlow);
   --font-display: var(--font-barlow-condensed);
-
-  /* Apelidos temporários dos nomes antigos, para o site não quebrar no meio do redesign. Sair na Tarefa 7. */
-  --color-bg: var(--color-page);
-  --color-card: var(--color-surface);
-  --color-card-inner: var(--color-tier-3);
-  --color-accent: var(--color-brand-teal-ink);
-  --color-strong: var(--color-tier-4-fg);
-  --color-strong-bg: var(--color-tier-4);
-  --color-weak: var(--color-tier-2-fg);
-  --color-weak-bg: var(--color-tier-2);
 }
 
 @utility bg-brand-gradient {

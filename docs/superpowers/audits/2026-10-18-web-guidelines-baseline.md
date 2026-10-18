@@ -135,3 +135,64 @@ Fica de fora a regra "Title Case": ela é da língua inglesa, e o site usa a cai
 - **Regra de vencedor na comparação** (frente de dados): `LOWER_IS_BETTER` em
   `components/CompareDashboard.tsx:13` não inclui `xg_against`, `goals_against_1h` nem `goals_against_2h`.
   Por isso a comparação dá vitória a quem sofre mais. **[fix]**
+
+---
+
+# Situação após o redesign (2026-10-18)
+
+Auditoria refeita depois das Tarefas 1–7 do plano. As linhas abaixo apontam o código **atual**.
+
+## Resolvidos pelo redesign
+
+- Todos os itens **[plano T#]** da lista acima.
+- Também foram resolvidos 5 itens que estavam como **[fix]**, porque os arquivos foram reescritos:
+  foco visível em `RankingList`, `StandingsTable` e `StrengthHeatmap`; `tabular-nums` em `MonthlyGoalsChart` e `MetricList`.
+
+## Pendências para o fix (continuam abertas)
+
+### Acessibilidade e semântica
+- app/layout.tsx:19 - falta link "pular para o conteúdo" apontando para `<main>`
+- components/PercentileBar.tsx:7 - `aria-label` em `div` sem `role`; leitor de tela ignora (usar `role="img"` ou `meter`)
+- components/StandingsTable.tsx:37 - cabeçalhos "P", "J", "V-E-D", "SG" sem `<abbr title>`
+- components/DimensionScores.tsx:39 - tooltip com `transition-opacity` sem `motion-reduce:transition-none`
+
+### Estado e navegação
+- components/TeamDashboard.tsx:33 - visão em `useState`; não vai para a URL (`?visao=casa`), então não dá para compartilhar o link
+- components/CompareDashboard.tsx:73 - mesma coisa nas duas visões da comparação
+
+### Conteúdo e tipografia
+- app/liga/[id]/page.tsx:59, components/TeamDashboard.tsx:56, app/error.tsx:6 - `h1` sem `text-balance`
+- components/StandingsTable.tsx:53 - nome do time com `whitespace-nowrap`; nome longo alarga a tabela (hoje rola dentro do card)
+
+### Metadados e performance
+- app/layout.tsx:14 - falta `themeColor: "#071317"` no metadata
+- app/layout.tsx:26 - nome da marca sem `translate="no"`
+- components/Crest.tsx:12 - `<img>` sem `loading="lazy"` (20 escudos na classificação)
+
+## Problemas encontrados durante a implementação
+
+### Alta prioridade
+- **next.config.ts:14 - CSP quebra o `npm run dev`.** O `script-src` não tem `'unsafe-eval'`, e o modo de
+  desenvolvimento do Next usa `eval`. O navegador bloqueia (`EvalError … 'unsafe-eval' is not an allowed source`),
+  o React nunca hidrata e **nenhum botão funciona em desenvolvimento** (Geral/Casa/Fora, "!", seletor de rival).
+  Produção não é afetada: confirmado com `next build` + `next start`, onde a página hidrata e o clique funciona.
+  Correção sugerida: acrescentar `'unsafe-eval'` ao `script-src` só quando `NODE_ENV === "development"`.
+- **components/CompareDashboard.tsx:17 - vencedor invertido na comparação** (frente de dados).
+  `LOWER_IS_BETTER` não inclui `xg_against`, `goals_against_1h` nem `goals_against_2h`. Visto com dados reais:
+  em "Gols sofridos no 1º tempo", Chapecoense (1,00) aparece como melhor que Atletico Paranaense (0,68).
+
+### Ambiente
+- **`.env.local` está com o usuário admin (`postgres`).** A senha da `dashboard_readonly` no Postgres de
+  produção (porta 21786) não confere. Voltar para a role somente-leitura assim que a senha for acertada.
+- O banco de teste fica vazio entre execuções (os testes fazem `TRUNCATE`); não serve para conferência visual.
+
+### Dados (frente de dados, só observado)
+- Premier League: "Intensidade" sem nota ("—") para 6 times (Arsenal, Brighton, Chelsea, Brentford, Aston Villa, Tottenham).
+- xG, xG sofrido e gols evitados aparecem como "—" no Brasileirão.
+- "Gols por minuto" mostra "0 jogos com minuto dos gols" para o Atletico Paranaense.
+
+### Polimento visual (baixa prioridade)
+- No celular, os KPIs ficam um por linha (3 na liga, 4 no time) e ocupam muita altura; dá para usar 2 ou 3 colunas compactas.
+- No celular, as opções "1º turno" e "2º turno" do seletor de visão ficam escondidas na rolagem horizontal,
+  sem nenhuma indicação de que há mais opções (dá para usar um degradê na borda).
+- No desktop, o bloco "Nota por dimensão" fica com espaço vazio embaixo quando a lista de fortes e fracos ao lado é longa.
