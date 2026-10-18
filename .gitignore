@@ -4,3 +4,8 @@ node_modules
 *.tsbuildinfo
 next-env.d.ts
 .worktrees
+
+# ferramentas locais (skills e mockups do brainstorming)
+.superpowers/
+.agents/
+skills-lock.json
