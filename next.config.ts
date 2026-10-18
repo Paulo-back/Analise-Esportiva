@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+// O modo de desenvolvimento do Next usa eval; sem isso o React não hidrata no `npm run dev`.
+const scriptSrc = process.env.NODE_ENV === "development" ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'";
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
@@ -13,7 +16,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:",
+              `default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src ${scriptSrc}; font-src 'self' data:`,
           },
         ],
       },
