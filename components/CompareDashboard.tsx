@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useVenueParam } from "@/lib/useVenueParam";
 import { Card } from "@/components/Card";
 import { Crest } from "@/components/Crest";
 import { MirrorBar } from "@/components/MirrorBar";
@@ -70,8 +70,8 @@ function TeamSide({ team, ring, align, venue, onVenue }: {
 }
 
 export function CompareDashboard({ a, b, rivals }: { a: TeamProfile; b: TeamProfile; rivals: TeamRef[] }) {
-  const [venueA, setVenueA] = useState<Venue>("all");
-  const [venueB, setVenueB] = useState<Venue>("all");
+  const [venueA, setVenueA] = useVenueParam("visao");
+  const [venueB, setVenueB] = useVenueParam("visao_rival");
   const rowsA = a.byVenue[venueA];
   const rowsB = b.byVenue[venueB];
   const scoresA = dimensionScores(rowsA);

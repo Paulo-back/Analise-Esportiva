@@ -56,7 +56,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
       <div className="flex flex-wrap items-center gap-3">
         <Crest src={league.logoUrl} alt={league.name} size={44} />
         <div>
-          <h1 className="font-display text-3xl font-extrabold uppercase leading-none">{league.name}</h1>
+          <h1 className="text-balance font-display text-3xl font-extrabold uppercase leading-none">{league.name}</h1>
           <div className="mt-1 flex flex-wrap gap-x-1 text-xs text-muted">
             <span>Temporada {league.season}</span>
             {computedAt && <span aria-hidden>·</span>}

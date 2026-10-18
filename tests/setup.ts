@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { afterAll, beforeAll } from "vitest";
+import { afterAll, afterEach, beforeAll } from "vitest";
 import { pool } from "@/lib/db";
 
 beforeAll(async () => {
@@ -55,6 +55,11 @@ beforeAll(async () => {
       UNIQUE (team_id, league_id, season, venue, metric)
     );
   `);
+});
+
+// Componentes guardam a visão na URL (?visao=); cada teste começa sem query string.
+afterEach(() => {
+  if (typeof window !== "undefined") window.history.replaceState(null, "", "/");
 });
 
 afterAll(async () => {

@@ -34,12 +34,12 @@ export function StandingsTable({
       <table className="w-full text-xs tabular-nums">
         <thead>
           <tr className="text-muted">
-            <th className="px-1 py-1 text-left font-semibold">#</th>
+            <th className="px-1 py-1 text-left font-semibold"><abbr title="Posição" className="no-underline">#</abbr></th>
             <th className="px-1 text-left font-semibold">Time</th>
-            <th className="px-1 font-semibold">P</th>
-            <th className="px-1 font-semibold">J</th>
-            <th className="px-1 font-semibold">V-E-D</th>
-            <th className="px-1 font-semibold">SG</th>
+            <th className="px-1 font-semibold"><abbr title="Pontos" className="no-underline">P</abbr></th>
+            <th className="px-1 font-semibold"><abbr title="Jogos" className="no-underline">J</abbr></th>
+            <th className="px-1 font-semibold"><abbr title="Vitórias, empates e derrotas" className="no-underline">V-E-D</abbr></th>
+            <th className="px-1 font-semibold"><abbr title="Saldo de gols" className="no-underline">SG</abbr></th>
             <th className="hidden px-1 text-left font-semibold sm:table-cell">Melhor · pior</th>
           </tr>
         </thead>
@@ -50,8 +50,8 @@ export function StandingsTable({
               <tr key={r.teamId} className="even:bg-page">
                 <td className="px-1 py-1.5">{r.position}</td>
                 <td className="px-1 py-1.5">
-                  <Link href={`/time/${r.teamId}`} className="flex items-center gap-2 whitespace-nowrap rounded font-medium hover:text-brand-teal-ink focus-visible:outline-2 focus-visible:outline-brand-teal">
-                    <Crest src={r.teamLogoUrl} alt="" size={16} />
+                  <Link href={`/time/${r.teamId}`} className="flex min-w-32 items-center gap-2 rounded font-medium hover:text-brand-teal-ink focus-visible:outline-2 focus-visible:outline-brand-teal">
+                    <span className="shrink-0"><Crest src={r.teamLogoUrl} alt="" size={16} /></span>
                     {r.teamName}
                   </Link>
                   {/* No celular a coluna de destaque não cabe: as pílulas descem para baixo do nome. */}

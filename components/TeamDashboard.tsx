@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useVenueParam } from "@/lib/useVenueParam";
 import { Card } from "@/components/Card";
 import { Crest } from "@/components/Crest";
 import { DimensionScores } from "@/components/DimensionScores";
@@ -30,7 +30,7 @@ function leagueHint(row: ReturnType<typeof pickRows>): string | undefined {
 export function TeamDashboard({
   profile, standing, months, rivals,
 }: { profile: TeamProfile; standing: StandingRow | null; months: TeamMonthGoals[]; rivals: TeamRef[] }) {
-  const [venue, setVenue] = useState<Venue>("all");
+  const [venue, setVenue] = useVenueParam("visao");
   const rows = profile.byVenue[venue];
   const enough = hasEnoughSample(rows);
   const goalsFor = pickRows(rows, "goals_for");
@@ -53,7 +53,7 @@ export function TeamDashboard({
       <div className="flex flex-wrap items-center gap-3">
         <Crest src={profile.teamLogoUrl} alt={profile.teamName} size={48} />
         <div className="min-w-0">
-          <h1 className="font-display text-3xl font-extrabold uppercase leading-none">{profile.teamName}</h1>
+          <h1 className="text-balance font-display text-3xl font-extrabold uppercase leading-none">{profile.teamName}</h1>
           <p className="mt-1 text-xs text-muted">
             <Link
               href={`/liga/${profile.leagueId}`}

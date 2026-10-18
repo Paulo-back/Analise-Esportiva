@@ -36,7 +36,7 @@ export function DimensionScores({ scores }: { scores: Scores }) {
             <span
               id={tooltipId}
               role="tooltip"
-              className={`invisible absolute top-full z-10 mt-1 w-60 rounded-lg border border-line bg-surface p-3 text-left text-xs font-normal leading-snug text-fg opacity-0 shadow-lg transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 ${TOOLTIP_POSITION[i]}`}
+              className={`invisible absolute top-full z-10 mt-1 w-60 rounded-lg border border-line bg-surface p-3 text-left text-xs font-normal leading-snug text-fg opacity-0 shadow-lg transition-opacity motion-reduce:transition-none group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 ${TOOLTIP_POSITION[i]}`}
             >
               {DIMENSION_HELP[d]}
               <span className="mt-2 block text-muted">{PERCENTILE_HELP}</span>

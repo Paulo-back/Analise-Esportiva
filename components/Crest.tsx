@@ -9,5 +9,5 @@ export function Crest({ src, alt, size = 24 }: { src: string | null; alt: string
       />
     );
   }
-  return <img src={src} alt={alt} width={size} height={size} className="inline-block object-contain" />;
+  return <img src={src} alt={alt} width={size} height={size} loading="lazy" decoding="async" className="inline-block object-contain" />;
 }

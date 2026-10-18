@@ -27,6 +27,17 @@ describe("TeamDashboard", () => {
     expect(screen.getAllByText("2,00 (20)").length).toBeGreaterThan(0);
   });
 
+  it("guarda a visão na URL e abre nela", () => {
+    const { unmount } = render(<TeamDashboard profile={profile} standing={null} months={[]} rivals={[]} />);
+    fireEvent.click(screen.getByRole("button", { name: "Casa" }));
+    expect(window.location.search).toBe("?visao=casa");
+    unmount();
+    render(<TeamDashboard profile={profile} standing={null} months={[]} rivals={[]} />);
+    expect(screen.getByRole("button", { name: "Casa" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Geral" }));
+    expect(window.location.search).toBe("");
+  });
+
   it("avisa amostra insuficiente na visão Fora", () => {
     render(<TeamDashboard profile={profile} standing={null} months={[]} rivals={[]} />);
     fireEvent.click(screen.getByRole("button", { name: "Fora" }));

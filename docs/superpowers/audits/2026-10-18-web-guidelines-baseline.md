@@ -148,31 +148,23 @@ Auditoria refeita depois das Tarefas 1–7 do plano. As linhas abaixo apontam o 
 - Também foram resolvidos 5 itens que estavam como **[fix]**, porque os arquivos foram reescritos:
   foco visível em `RankingList`, `StandingsTable` e `StrengthHeatmap`; `tabular-nums` em `MonthlyGoalsChart` e `MetricList`.
 
-## Pendências para o fix (continuam abertas)
+## Pendências do fix (resolvidas em 2026-10-18)
 
-### Acessibilidade e semântica
-- app/layout.tsx:19 - falta link "pular para o conteúdo" apontando para `<main>`
-- components/PercentileBar.tsx:7 - `aria-label` em `div` sem `role`; leitor de tela ignora (usar `role="img"` ou `meter`)
-- components/StandingsTable.tsx:37 - cabeçalhos "P", "J", "V-E-D", "SG" sem `<abbr title>`
-- components/DimensionScores.tsx:39 - tooltip com `transition-opacity` sem `motion-reduce:transition-none`
-
-### Estado e navegação
-- components/TeamDashboard.tsx:33 - visão em `useState`; não vai para a URL (`?visao=casa`), então não dá para compartilhar o link
-- components/CompareDashboard.tsx:73 - mesma coisa nas duas visões da comparação
-
-### Conteúdo e tipografia
-- app/liga/[id]/page.tsx:59, components/TeamDashboard.tsx:56, app/error.tsx:6 - `h1` sem `text-balance`
-- components/StandingsTable.tsx:53 - nome do time com `whitespace-nowrap`; nome longo alarga a tabela (hoje rola dentro do card)
-
-### Metadados e performance
-- app/layout.tsx:14 - falta `themeColor: "#071317"` no metadata
-- app/layout.tsx:26 - nome da marca sem `translate="no"`
-- components/Crest.tsx:12 - `<img>` sem `loading="lazy"` (20 escudos na classificação)
+Todas as 11 pendências acima foram corrigidas:
+- link "Pular para o conteúdo" no `app/layout.tsx`, apontando para `<main id="conteudo">`;
+- `PercentileBar` com `role="img"`;
+- siglas da classificação (#, P, J, V-E-D, SG) em `<abbr title>`;
+- tooltip das dimensões com `motion-reduce:transition-none`;
+- visão na URL (`?visao=casa`; na comparação também `?visao_rival=`), via `lib/useVenueParam.ts`. O hook lê
+  `window.location` depois de montar, então as páginas continuam estáticas (ISR);
+- `text-balance` nos `h1`;
+- nome do time na classificação quebra linha em vez de alargar a tabela;
+- `themeColor` no `viewport`, `translate="no"` na marca, escudos com `loading="lazy"`.
 
 ## Problemas encontrados durante a implementação
 
 ### Alta prioridade
-- **next.config.ts:14 - CSP quebra o `npm run dev`.** O `script-src` não tem `'unsafe-eval'`, e o modo de
+- ~~**next.config.ts:14 - CSP quebra o `npm run dev`.**~~ Resolvido: `'unsafe-eval'` só em desenvolvimento. O `script-src` não tem `'unsafe-eval'`, e o modo de
   desenvolvimento do Next usa `eval`. O navegador bloqueia (`EvalError … 'unsafe-eval' is not an allowed source`),
   o React nunca hidrata e **nenhum botão funciona em desenvolvimento** (Geral/Casa/Fora, "!", seletor de rival).
   Produção não é afetada: confirmado com `next build` + `next start`, onde a página hidrata e o clique funciona.

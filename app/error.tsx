@@ -3,7 +3,7 @@
 export default function ErrorPage({ reset }: { error: Error; reset: () => void }) {
   return (
     <div className="py-20 text-center">
-      <h1 className="font-display text-3xl font-extrabold uppercase">Não foi possível carregar os dados agora</h1>
+      <h1 className="text-balance font-display text-3xl font-extrabold uppercase">Não foi possível carregar os dados agora</h1>
       <p className="mt-2 text-muted">Tente novamente em alguns instantes.</p>
       <button
         onClick={reset}
