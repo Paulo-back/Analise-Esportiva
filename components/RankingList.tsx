@@ -32,8 +32,8 @@ export function RankingList({ items }: { items: RankingItem[] }) {
       {/* Em "Destaques" o mesmo time pode liderar mais de uma dimensão: chave por posição. */}
       {items.map((item, i) => (
         <li key={`${i}-${item.teamId}`} className="flex items-center justify-between gap-2">
-          <Link href={`/time/${item.teamId}`} className="hover:text-accent">{item.teamName}</Link>
-          <span className="rounded bg-accent px-2 text-xs font-bold text-bg">{item.display}</span>
+          <Link href={`/time/${item.teamId}`} className="rounded hover:text-brand-teal-ink focus-visible:outline-2 focus-visible:outline-brand-teal">{item.teamName}</Link>
+          <span className="shrink-0 rounded-full bg-tier-3 px-2 py-0.5 text-xs font-bold tabular-nums">{item.display}</span>
         </li>
       ))}
     </ol>

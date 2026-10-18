@@ -31,26 +31,26 @@ export function StandingsTable({
   if (!rows.length) return <p className="text-sm text-muted">Classificação disponível após as primeiras rodadas.</p>;
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-xs">
+      <table className="w-full text-xs tabular-nums">
         <thead>
           <tr className="text-muted">
-            <th className="px-1 py-1 text-left font-normal">#</th>
-            <th className="px-1 text-left font-normal">Time</th>
-            <th className="px-1 font-normal">P</th>
-            <th className="px-1 font-normal">J</th>
-            <th className="px-1 font-normal">V-E-D</th>
-            <th className="px-1 font-normal">SG</th>
-            <th className="hidden px-1 text-left font-normal sm:table-cell">Melhor · pior</th>
+            <th className="px-1 py-1 text-left font-semibold">#</th>
+            <th className="px-1 text-left font-semibold">Time</th>
+            <th className="px-1 font-semibold">P</th>
+            <th className="px-1 font-semibold">J</th>
+            <th className="px-1 font-semibold">V-E-D</th>
+            <th className="px-1 font-semibold">SG</th>
+            <th className="hidden px-1 text-left font-semibold sm:table-cell">Melhor · pior</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => {
             const h = highlights[r.teamId];
             return (
-              <tr key={r.teamId} className="even:bg-card-inner">
+              <tr key={r.teamId} className="even:bg-page">
                 <td className="px-1 py-1.5">{r.position}</td>
                 <td className="px-1 py-1.5">
-                  <Link href={`/time/${r.teamId}`} className="flex items-center gap-2 whitespace-nowrap hover:text-accent">
+                  <Link href={`/time/${r.teamId}`} className="flex items-center gap-2 whitespace-nowrap rounded font-medium hover:text-brand-teal-ink focus-visible:outline-2 focus-visible:outline-brand-teal">
                     <Crest src={r.teamLogoUrl} alt="" size={16} />
                     {r.teamName}
                   </Link>

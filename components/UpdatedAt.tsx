@@ -1,5 +1,7 @@
-export function UpdatedAt({ date }: { date: Date | null }) {
+export function UpdatedAt({
+  date, className = "text-center text-xs text-muted",
+}: { date: Date | null; className?: string }) {
   if (!date) return null;
   const formatted = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo" }).format(date);
-  return <p className="text-center text-xs text-muted">Dados atualizados em {formatted}</p>;
+  return <p className={className}>Dados atualizados em {formatted}</p>;
 }

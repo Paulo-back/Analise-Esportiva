@@ -77,4 +77,13 @@ describe("MonthlyGoalsChart", () => {
     expect(screen.getByText("abr")).toBeInTheDocument();
     expect(screen.getByText("6 · 2")).toBeInTheDocument();
   });
+
+  it("destaca só o mês de pico quando pedido", () => {
+    const { container } = render(
+      <MonthlyGoalsChart highlightMax series={[{ label: "abr", primary: 6 }, { label: "mai", primary: 9 }]} />
+    );
+    const peaks = container.querySelectorAll("[data-peak]");
+    expect(peaks).toHaveLength(1);
+    expect(peaks[0].parentElement?.parentElement).toHaveTextContent("mai");
+  });
 });

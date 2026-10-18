@@ -50,56 +50,56 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
     return best ? { teamId: best.teamId, teamName: best.teamName, display: DIMENSION_LABELS[d] } : null;
   }).filter((x): x is { teamId: number; teamName: string; display: string } => x !== null);
 
+  // "Forças em primeiro": o mapa é o diferencial do site, então abre a página; a tabela vem como contexto.
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-xl bg-card p-4">
-        <Crest src={league.logoUrl} alt={league.name} size={40} />
+      <div className="flex flex-wrap items-center gap-3">
+        <Crest src={league.logoUrl} alt={league.name} size={44} />
         <div>
-          <h1 className="text-xl font-bold uppercase">{league.name}</h1>
-          <p className="text-xs text-muted">Temporada {league.season}</p>
+          <h1 className="font-display text-3xl font-extrabold uppercase leading-none">{league.name}</h1>
+          <div className="mt-1 flex flex-wrap gap-x-1 text-xs text-muted">
+            <span>Temporada {league.season}</span>
+            {computedAt && <span aria-hidden>·</span>}
+            <UpdatedAt date={computedAt} className="" />
+          </div>
         </div>
         <div className="w-full lg:ml-auto lg:w-auto"><LeaguePills leagues={leagues} activeId={league.id} /></div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <KpiCard title="Partidas" value={formatNumber(kpis.matches, 0)} />
-        <KpiCard title="Gols" value={formatNumber(kpis.goals, 0)} />
-        <KpiCard title="Média de gols" value={kpis.avgGoals === null ? "—" : formatNumber(kpis.avgGoals, 2)} />
-      </div>
+      {/* min-w-0 nos blocos com tabela: sem isso o item do grid não encolhe e empurra a página no celular */}
+      <div className="grid gap-4 lg:grid-cols-12">
+        <div className="grid gap-4 sm:grid-cols-3 lg:col-span-12">
+          <KpiCard title="Partidas" value={formatNumber(kpis.matches, 0)} />
+          <KpiCard title="Gols" value={formatNumber(kpis.goals, 0)} />
+          <KpiCard title="Média de gols" value={kpis.avgGoals === null ? "—" : formatNumber(kpis.avgGoals, 2)} />
+        </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* min-w-0: sem isso o item do grid não encolhe e a tabela empurra a página no celular */}
-        <Card
-          className="min-w-0"
-          title="Mapa de forças"
-          subtitle="nota por dimensão · verde ≥ 75 · verde claro 60–74 · vermelho claro 26–39 · vermelho ≤ 25"
-        >
+        <Card featured className="min-w-0 lg:col-span-8" title="Mapa de forças" subtitle="nota por dimensão, de 0 a 100">
           <StrengthHeatmap teams={heatmapTeams} />
         </Card>
-        <Card className="min-w-0" title="Classificação" subtitle="com a melhor e a pior dimensão de cada time">
-          <StandingsTable rows={standings} highlights={highlights} />
-        </Card>
-      </div>
-
-      <Card title="Gols por mês" subtitle="total de gols da liga">
-        <MonthlyGoalsChart series={months.map((m) => ({ label: formatMonth(m.month), primary: m.goals }))} />
-      </Card>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card title="Melhores ataques" subtitle="gols por jogo (total)">
-          <RankingList items={topByMetric(profiles, "goals_for", "desc", 5)} />
-        </Card>
-        <Card title="Melhores defesas" subtitle="gols sofridos por jogo (total)">
-          <RankingList items={topByMetric(profiles, "goals_against", "asc", 5)} />
-        </Card>
-        <Card title="Mais indisciplinados" subtitle="amarelos por jogo (total)">
-          <RankingList items={topByMetric(profiles, "yellow_cards", "desc", 5)} />
-        </Card>
-        <Card title="Destaques" subtitle="líder de cada dimensão">
+        <Card className="lg:col-span-4" title="Destaques" subtitle="líder de cada dimensão">
           <RankingList items={leaders} />
         </Card>
+
+        <Card className="min-w-0 lg:col-span-7" title="Classificação" subtitle="com a melhor e a pior dimensão de cada time">
+          <StandingsTable rows={standings} highlights={highlights} />
+        </Card>
+        <Card className="lg:col-span-5" title="Gols por mês" subtitle="total de gols da liga · mês de pico em âmbar">
+          <MonthlyGoalsChart highlightMax series={months.map((m) => ({ label: formatMonth(m.month), primary: m.goals }))} />
+        </Card>
+
+        <div className="grid gap-4 sm:grid-cols-3 lg:col-span-12">
+          <Card title="Melhores ataques" subtitle="gols por jogo (total)">
+            <RankingList items={topByMetric(profiles, "goals_for", "desc", 5)} />
+          </Card>
+          <Card title="Melhores defesas" subtitle="gols sofridos por jogo (total)">
+            <RankingList items={topByMetric(profiles, "goals_against", "asc", 5)} />
+          </Card>
+          <Card title="Mais indisciplinados" subtitle="amarelos por jogo (total)">
+            <RankingList items={topByMetric(profiles, "yellow_cards", "desc", 5)} />
+          </Card>
+        </div>
       </div>
-      <UpdatedAt date={computedAt} />
     </div>
   );
 }
