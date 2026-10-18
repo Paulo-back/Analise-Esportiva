@@ -15,14 +15,14 @@ const TOOLTIP_POSITION = [
 
 export function DimensionScores({ scores }: { scores: Scores }) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+    <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-5 lg:auto-rows-fr">
       {JUDGED_DIMENSIONS.map((d, i) => {
         const score = scores[d];
         const tier = scoreTier(score);
         const tooltipId = `dimension-help-${d}`;
         // Mesma escala de cor do mapa de forças da liga.
         return (
-          <div key={d} className={`group relative rounded-xl p-3 text-center text-xs font-semibold ${tier ? TIER_CLASS[tier] : "bg-tier-3"}`}>
+          <div key={d} className={`group relative flex flex-col justify-center rounded-xl p-3 text-center text-xs font-semibold ${tier ? TIER_CLASS[tier] : "bg-tier-3"}`}>
             {DIMENSION_LABELS[d]}
             <button
               type="button"

@@ -169,7 +169,7 @@ Todas as 11 pendências acima foram corrigidas:
   o React nunca hidrata e **nenhum botão funciona em desenvolvimento** (Geral/Casa/Fora, "!", seletor de rival).
   Produção não é afetada: confirmado com `next build` + `next start`, onde a página hidrata e o clique funciona.
   Correção sugerida: acrescentar `'unsafe-eval'` ao `script-src` só quando `NODE_ENV === "development"`.
-- **components/CompareDashboard.tsx:17 - vencedor invertido na comparação** (frente de dados).
+- ~~**components/CompareDashboard.tsx:17 - vencedor invertido na comparação**~~ Resolvido: as três métricas entraram em `LOWER_IS_BETTER`.
   `LOWER_IS_BETTER` não inclui `xg_against`, `goals_against_1h` nem `goals_against_2h`. Visto com dados reais:
   em "Gols sofridos no 1º tempo", Chapecoense (1,00) aparece como melhor que Atletico Paranaense (0,68).
 
@@ -179,12 +179,14 @@ Todas as 11 pendências acima foram corrigidas:
 - O banco de teste fica vazio entre execuções (os testes fazem `TRUNCATE`); não serve para conferência visual.
 
 ### Dados (frente de dados, só observado)
-- Premier League: "Intensidade" sem nota ("—") para 6 times (Arsenal, Brighton, Chelsea, Brentford, Aston Villa, Tottenham).
-- xG, xG sofrido e gols evitados aparecem como "—" no Brasileirão.
-- "Gols por minuto" mostra "0 jogos com minuto dos gols" para o Atletico Paranaense.
+Reconferido no banco em 2026-10-18, só com consultas de leitura: as três lacunas já não existem.
+A frente de dados recalculou `team_profile_metrics`, e o painel só mostra o que vem do banco.
+- Intensidade: os 20 times da Premier League têm percentil de duelos.
+- xG, xG sofrido e gols evitados têm valor no Brasileirão, mas com poucos jogos (até 4 por time), então ainda não
+  aparecem com percentil. Nas ligas europeias o xG ainda cobre 1–2 jogos, e gols evitados está vazio.
+- Gols por minuto: as 8 ligas têm o dado (o Atletico Paranaense também).
 
-### Polimento visual (baixa prioridade)
-- No celular, os KPIs ficam um por linha (3 na liga, 4 no time) e ocupam muita altura; dá para usar 2 ou 3 colunas compactas.
-- No celular, as opções "1º turno" e "2º turno" do seletor de visão ficam escondidas na rolagem horizontal,
-  sem nenhuma indicação de que há mais opções (dá para usar um degradê na borda).
-- No desktop, o bloco "Nota por dimensão" fica com espaço vazio embaixo quando a lista de fortes e fracos ao lado é longa.
+### Polimento visual (resolvido)
+- KPIs compactos no celular: 3 por linha na liga e 2 no time.
+- O seletor de visão mostra um degradê na borda que ainda tem opções escondidas.
+- No desktop, os blocos de "Nota por dimensão" esticam até a altura da coluna ao lado.

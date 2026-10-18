@@ -68,7 +68,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
 
       {/* min-w-0 nos blocos com tabela: sem isso o item do grid não encolhe e empurra a página no celular */}
       <div className="grid gap-4 lg:grid-cols-12">
-        <div className="grid gap-4 sm:grid-cols-3 lg:col-span-12">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:col-span-12">
           <KpiCard title="Partidas" value={formatNumber(kpis.matches, 0)} />
           <KpiCard title="Gols" value={formatNumber(kpis.goals, 0)} />
           <KpiCard title="Média de gols" value={kpis.avgGoals === null ? "—" : formatNumber(kpis.avgGoals, 2)} />

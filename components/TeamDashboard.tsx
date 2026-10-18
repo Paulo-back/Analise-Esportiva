@@ -87,7 +87,7 @@ export function TeamDashboard({
       <div className="grid gap-4 lg:grid-cols-12">
         {enough && (
           <>
-            <Card featured className="lg:col-span-8" title="Nota por dimensão" subtitle="percentil médio na liga (0–100)">
+            <Card featured className="flex flex-col lg:col-span-8" title="Nota por dimensão" subtitle="percentil médio na liga (0–100)">
               <DimensionScores scores={dimensionScores(rows)} />
             </Card>
             <Card className="lg:col-span-4" title="Pontos fortes · fracos" subtitle="métricas no topo e no fundo da liga">
@@ -96,7 +96,7 @@ export function TeamDashboard({
           </>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:col-span-12 lg:grid-cols-4">
           <KpiCard
             title="Campanha"
             value={standing ? `${standing.wins}-${standing.draws}-${standing.losses}` : "—"}
