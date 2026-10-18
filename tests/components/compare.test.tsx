@@ -15,7 +15,7 @@ function team(id: number, name: string, goalsFor: number, goalsAgainst: number):
   const rows = [row("goals_for", "attack", goalsFor, 50), row("goals_against", "defense", goalsAgainst, 50)];
   return {
     teamId: id, teamName: name, teamLogoUrl: null, leagueId: 1, leagueName: "Brasileirão Série A", season: 2026,
-    byVenue: { all: rows, home: rows, away: rows },
+    byVenue: { all: rows, home: rows, away: rows, turn_1: rows, turn_2: rows },
   };
 }
 

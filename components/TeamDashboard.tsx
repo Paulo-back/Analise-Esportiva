@@ -10,9 +10,14 @@ import { MetricList } from "@/components/MetricList";
 import { MonthlyGoalsChart } from "@/components/MonthlyGoalsChart";
 import { StrengthPills } from "@/components/StrengthPills";
 import {
-  MIN_GAMES, VENUE_LABELS, dimensionScores, formatMetric, formatMonth, formatNumber, hasEnoughSample, pickRows,
+  GOAL_MINUTE_BUCKETS, MIN_GAMES, VENUE_LABELS, dimensionScores, formatMetric, formatMonth, formatNumber,
+  hasEnoughSample, pickRows,
 } from "@/lib/profile";
 import type { StandingRow, TeamMonthGoals, TeamProfile, TeamRef, Venue } from "@/lib/types";
+
+function totalOf(rows: ReturnType<typeof pickRows>[]): number[] {
+  return rows.map((r) => (r?.total ?? 0));
+}
 
 function leagueHint(row: ReturnType<typeof pickRows>): string | undefined {
   if (!row || row.leagueAvg === null) return undefined;
@@ -28,6 +33,16 @@ export function TeamDashboard({
   const goalsFor = pickRows(rows, "goals_for");
   const goalsAgainst = pickRows(rows, "goals_against");
   const cleanSheets = pickRows(rows, "clean_sheet_pct");
+  const [for1h, for2h, against1h, against2h] = totalOf(
+    ["goals_for_1h", "goals_for_2h", "goals_against_1h", "goals_against_2h"].map((m) => pickRows(rows, m))
+  );
+  const halfGames = pickRows(rows, "goals_for_1h")?.gamesCounted ?? 0;
+  const minuteGames = pickRows(rows, "goals_for_min_0_15")?.gamesCounted ?? 0;
+  const minuteSeries = GOAL_MINUTE_BUCKETS.map((b) => ({
+    label: b.label,
+    primary: pickRows(rows, `goals_for_min_${b.key}`)?.total ?? 0,
+    secondary: pickRows(rows, `goals_against_min_${b.key}`)?.total ?? 0,
+  }));
 
   return (
     <div className="space-y-4">
@@ -95,6 +110,28 @@ export function TeamDashboard({
           <MonthlyGoalsChart
             series={months.map((m) => ({ label: formatMonth(m.month), primary: m.scored, secondary: m.conceded }))}
           />
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card title="Gols por tempo" subtitle={`marcados (verde) · sofridos (vermelho) · ${halfGames} jogos com placar do intervalo`}>
+          {halfGames ? (
+            <MonthlyGoalsChart
+              series={[
+                { label: "1º tempo", primary: for1h, secondary: against1h },
+                { label: "2º tempo", primary: for2h, secondary: against2h },
+              ]}
+            />
+          ) : (
+            <p className="text-sm text-muted">Sem placar do intervalo nesta visão ainda.</p>
+          )}
+        </Card>
+        <Card title="Gols por minuto" subtitle={`marcados (verde) · sofridos (vermelho) · ${minuteGames} jogos com minuto dos gols`}>
+          {minuteGames ? (
+            <MonthlyGoalsChart series={minuteSeries} />
+          ) : (
+            <p className="text-sm text-muted">Minuto dos gols ainda sendo carregado nesta visão.</p>
+          )}
         </Card>
       </div>
     </div>

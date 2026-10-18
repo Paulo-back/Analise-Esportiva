@@ -1,6 +1,9 @@
-export type Venue = "all" | "home" | "away";
-export type Dimension = "attack" | "defense" | "intensity" | "set_piece" | "discipline" | "style";
-export type JudgedDimension = Exclude<Dimension, "style">;
+// "venue" é o recorte: geral, casa, fora e os dois turnos (metade das rodadas).
+export type Venue = "all" | "home" | "away" | "turn_1" | "turn_2";
+export type Dimension =
+  | "attack" | "defense" | "intensity" | "set_piece" | "discipline" | "style" | "timing";
+// style e timing são informativos: sem percentil e fora das notas.
+export type JudgedDimension = Exclude<Dimension, "style" | "timing">;
 
 export interface MetricRow {
   metric: string;

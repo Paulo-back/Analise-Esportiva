@@ -28,8 +28,9 @@ function row(partial: Partial<MetricRow> & Pick<MetricRow, "metric">): MetricRow
 }
 
 describe("METRIC_INFO", () => {
-  it("cobre as 25 métricas do pipeline", () => {
-    expect(Object.keys(METRIC_INFO)).toHaveLength(25);
+  it("cobre as 32 métricas do pipeline que aparecem em lista", () => {
+    // 25 originais + 3 de xG + 4 de gols por tempo; as 12 faixas de minuto só aparecem no gráfico.
+    expect(Object.keys(METRIC_INFO)).toHaveLength(32);
   });
 });
 

@@ -7,7 +7,9 @@ export const GOOD_PERCENTILE = 60;
 export const POOR_PERCENTILE = 40;
 export const MIN_GAMES = 5;
 
-export const VENUE_LABELS: Record<Venue, string> = { all: "Geral", home: "Casa", away: "Fora" };
+export const VENUE_LABELS: Record<Venue, string> = {
+  all: "Geral", home: "Casa", away: "Fora", turn_1: "1º turno", turn_2: "2º turno",
+};
 
 export const JUDGED_DIMENSIONS: JudgedDimension[] = [
   "attack", "defense", "intensity", "set_piece", "discipline",
@@ -20,14 +22,15 @@ export const DIMENSION_LABELS: Record<Dimension, string> = {
   set_piece: "Bola parada",
   discipline: "Disciplina",
   style: "Estilo",
+  timing: "Tempo de jogo",
 };
 
 // Texto do "!" de cada nota; manter em sincronia com METRICS em pipeline/team_profiles.py.
 export const DIMENSION_HELP: Record<JudgedDimension, string> = {
   attack:
-    "Média dos percentis de gols pró, chutes, chutes no gol, chutes de dentro da área, conversão, passes-chave, dribles certos e pênaltis sofridos.",
+    "Média dos percentis de gols pró, xG (gols esperados), chutes, chutes no gol, chutes de dentro da área, conversão, passes-chave, dribles certos e pênaltis sofridos.",
   defense:
-    "Média dos percentis de gols sofridos, chutes no gol sofridos, vezes driblado, pênaltis cometidos, jogos sem sofrer gol, desarmes + interceptações, bloqueios e defesas do goleiro. Onde menos é melhor, a escala é invertida.",
+    "Média dos percentis de gols sofridos, xG sofrido, gols evitados pelo goleiro, chutes no gol sofridos, vezes driblado, pênaltis cometidos, jogos sem sofrer gol, desarmes + interceptações, bloqueios e defesas do goleiro. Onde menos é melhor, a escala é invertida.",
   intensity: "Percentil da porcentagem de duelos ganhos.",
   set_piece: "Percentil de escanteios por jogo.",
   discipline:
@@ -37,7 +40,8 @@ export const DIMENSION_HELP: Record<JudgedDimension, string> = {
 export const PERCENTILE_HELP =
   "Percentil = posição entre os times da mesma liga (0 a 100; 50 é a mediana). Só entram métricas com pelo menos 5 jogos.";
 
-type MetricKind = "count" | "mean" | "pct";
+// mean = média em porcentagem (posse); decimal = média com 2 casas (xG).
+type MetricKind = "count" | "mean" | "pct" | "decimal";
 
 // featured = aparece sem precisar expandir "ver todas" no painel do time.
 export const METRIC_INFO: Record<string, { label: string; kind: MetricKind; featured: boolean }> = {
@@ -66,7 +70,20 @@ export const METRIC_INFO: Record<string, { label: string; kind: MetricKind; feat
   passes_total: { label: "Passes", kind: "count", featured: true },
   passes_accuracy_pct: { label: "Precisão de passe", kind: "pct", featured: true },
   offsides: { label: "Impedimentos", kind: "count", featured: false },
+  xg: { label: "xG (gols esperados)", kind: "decimal", featured: true },
+  xg_against: { label: "xG sofrido", kind: "decimal", featured: true },
+  goals_prevented: { label: "Gols evitados pelo goleiro", kind: "decimal", featured: false },
+  goals_for_1h: { label: "Gols pró no 1º tempo", kind: "count", featured: false },
+  goals_for_2h: { label: "Gols pró no 2º tempo", kind: "count", featured: false },
+  goals_against_1h: { label: "Gols sofridos no 1º tempo", kind: "count", featured: false },
+  goals_against_2h: { label: "Gols sofridos no 2º tempo", kind: "count", featured: false },
 };
+
+// Faixas de minuto dos gols (métricas goals_for_min_* / goals_against_min_* do pipeline).
+export const GOAL_MINUTE_BUCKETS = [
+  { key: "0_15", label: "0-15" }, { key: "16_30", label: "16-30" }, { key: "31_45", label: "31-45" },
+  { key: "46_60", label: "46-60" }, { key: "61_75", label: "61-75" }, { key: "76_90", label: "76-90" },
+];
 
 export function metricLabel(metric: string): string {
   return METRIC_INFO[metric]?.label ?? metric;
@@ -155,6 +172,7 @@ export function formatMetric(row: MetricRow): string {
     return `${base} (${formatNumber(row.numerator, 0)}/${formatNumber(row.denominator, 0)})`;
   }
   if (kind === "mean") return `${formatNumber(row.value, 0)}%`;
+  if (kind === "decimal") return formatNumber(row.value, 2);
   const avg = formatNumber(row.value, 2);
   return row.total === null ? avg : `${avg} (${formatNumber(row.total, 0)})`;
 }

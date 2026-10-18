@@ -13,7 +13,10 @@ function goals(value: number, games: number, percentile: number): MetricRow {
 const profile: TeamProfile = {
   teamId: 10, teamName: "Palmeiras", teamLogoUrl: null, leagueId: 1, leagueName: "Brasileirão Série A",
   season: 2026,
-  byVenue: { all: [goals(1.5, 20, 80)], home: [goals(2, 10, 90)], away: [goals(1, 4, 40)] },
+  byVenue: {
+    all: [goals(1.5, 20, 80)], home: [goals(2, 10, 90)], away: [goals(1, 4, 40)],
+    turn_1: [goals(1.8, 10, 85)], turn_2: [goals(1.2, 10, 60)],
+  },
 };
 
 describe("TeamDashboard", () => {
@@ -36,5 +39,36 @@ describe("TeamDashboard", () => {
         rivals={[{ teamId: 11, teamName: "Flamengo", teamLogoUrl: null }]} />
     );
     expect(screen.getByRole("link", { name: /comparar/i })).toHaveAttribute("href", "/time/10/vs/11");
+  });
+});
+
+describe("TeamDashboard — dados de tempo de jogo", () => {
+  function timing(metric: string, total: number, games = 4): MetricRow {
+    return {
+      metric, dimension: "timing", value: total / games, total, numerator: null, denominator: null,
+      leagueAvg: null, percentile: null, gamesCounted: games,
+    };
+  }
+
+  it("mostra os botões de turno e os gráficos de gols por tempo e por minuto", () => {
+    const rows = [
+      goals(1.5, 20, 80),
+      timing("goals_for_1h", 7), timing("goals_for_2h", 9),
+      timing("goals_against_1h", 3), timing("goals_against_2h", 5),
+      timing("goals_for_min_76_90", 6), timing("goals_against_min_76_90", 2),
+      timing("goals_for_min_0_15", 1), timing("goals_against_min_0_15", 0),
+    ];
+    const withTiming: TeamProfile = { ...profile, byVenue: { ...profile.byVenue, all: rows } };
+    render(<TeamDashboard profile={withTiming} standing={null} months={[]} rivals={[]} />);
+
+    expect(screen.getByRole("button", { name: "1º turno" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "2º turno" })).toBeInTheDocument();
+    expect(screen.getByText("7 · 3")).toBeInTheDocument(); // 1º tempo: marcados · sofridos
+    expect(screen.getByText("6 · 2")).toBeInTheDocument(); // 76-90
+  });
+
+  it("avisa quando o minuto dos gols ainda não chegou", () => {
+    render(<TeamDashboard profile={profile} standing={null} months={[]} rivals={[]} />);
+    expect(screen.getByText(/Minuto dos gols ainda sendo carregado/)).toBeInTheDocument();
   });
 });

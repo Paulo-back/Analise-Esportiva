@@ -220,7 +220,7 @@ export async function getTeamProfile(teamId: number): Promise<TeamProfile | null
   );
   if (!rows.length) return null;
   const first = rows[0];
-  const byVenue: TeamProfile["byVenue"] = { all: [], home: [], away: [] };
+  const byVenue: TeamProfile["byVenue"] = { all: [], home: [], away: [], turn_1: [], turn_2: [] };
   for (const r of rows) byVenue[r.venue as Venue].push(toMetricRow(r));
   return {
     teamId: Number(first.team_id),
