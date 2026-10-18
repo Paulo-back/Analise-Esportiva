@@ -28,6 +28,12 @@ describe("compareWinner", () => {
     expect(compareWinner("goals_for", 1, 1)).toBeNull();
     expect(compareWinner("goals_for", null, 1)).toBeNull();
   });
+
+  it("xG sofrido e gols sofridos por tempo: menor é melhor", () => {
+    expect(compareWinner("xg_against", 1.4, 0.9)).toBe("b");
+    expect(compareWinner("goals_against_1h", 1.0, 0.68)).toBe("b");
+    expect(compareWinner("goals_against_2h", 0.5, 0.8)).toBe("a");
+  });
 });
 
 describe("RivalSelect", () => {

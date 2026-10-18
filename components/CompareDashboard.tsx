@@ -16,7 +16,7 @@ import type { Dimension, TeamProfile, TeamRef, Venue } from "@/lib/types";
 // Mesma direção do pipeline (pipeline/team_profiles.py METRICS): -1 = menor é melhor.
 const LOWER_IS_BETTER = new Set([
   "goals_against", "shots_on_goal_against", "dribbled_past", "penalties_committed",
-  "fouls", "yellow_cards", "red_cards",
+  "fouls", "yellow_cards", "red_cards", "xg_against", "goals_against_1h", "goals_against_2h",
 ]);
 const STYLE = new Set(["possession_pct", "passes_total", "passes_accuracy_pct", "offsides"]);
 
