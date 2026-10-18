@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { CompareDashboard, compareWinner } from "@/components/CompareDashboard";
+import { CompareDashboard, compareWinner, dimensionTally, tallyLabel } from "@/components/CompareDashboard";
+import { MirrorBar } from "@/components/MirrorBar";
 import { RivalSelect } from "@/components/RivalSelect";
 import type { MetricRow, TeamProfile } from "@/lib/types";
 
@@ -49,5 +50,41 @@ describe("CompareDashboard", () => {
     );
     expect(screen.getByText("1,78 (18)")).toBeInTheDocument();
     expect(screen.getByText("2,04 (20)")).toBeInTheDocument();
+  });
+});
+
+describe("MirrorBar", () => {
+  it("marca só o valor do vencedor", () => {
+    render(<MirrorBar label="Ataque" a={80} b={60} aText="80" bText="60" max={100} winner="a" />);
+    expect(screen.getByText("80")).toHaveAttribute("data-winner", "true");
+    expect(screen.getByText("60")).not.toHaveAttribute("data-winner");
+    expect(screen.getByLabelText("Ataque: 80 × 60")).toBeInTheDocument();
+  });
+
+  it("sem vencedor não marca nenhum lado", () => {
+    const { container } = render(<MirrorBar label="Posse" a={55} b={45} aText="55%" bText="45%" max={55} winner={null} />);
+    expect(container.querySelectorAll("[data-winner]")).toHaveLength(0);
+  });
+
+  it("valor ausente aparece como travessão", () => {
+    render(<MirrorBar label="xG" a={null} b={1.2} aText="—" bText="1,20" max={1.2} winner={null} />);
+    expect(screen.getByText("—")).toBeInTheDocument();
+  });
+});
+
+describe("placar de dimensões", () => {
+  const s = (attack: number | null, defense: number | null) =>
+    ({ attack, defense, intensity: null, set_piece: null, discipline: null });
+
+  it("conta só dimensões com as duas notas e diferentes", () => {
+    expect(dimensionTally(s(80, 40), s(60, 40))).toEqual({ a: 1, b: 0, total: 1 });
+    expect(dimensionTally(s(null, 40), s(60, 50))).toEqual({ a: 0, b: 1, total: 1 });
+  });
+
+  it("escreve vitória, empate ou nada", () => {
+    expect(tallyLabel("Palmeiras", "Flamengo", { a: 3, b: 2, total: 5 })).toBe("Palmeiras vence 3 de 5 dimensões");
+    expect(tallyLabel("Palmeiras", "Flamengo", { a: 1, b: 2, total: 3 })).toBe("Flamengo vence 2 de 3 dimensões");
+    expect(tallyLabel("Palmeiras", "Flamengo", { a: 2, b: 2, total: 4 })).toBe("Empate em dimensões (2 a 2)");
+    expect(tallyLabel("Palmeiras", "Flamengo", { a: 0, b: 0, total: 0 })).toBeNull();
   });
 });

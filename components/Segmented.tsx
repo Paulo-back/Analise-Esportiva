@@ -12,7 +12,7 @@ export function Segmented<T extends string>({
   const pad = size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs";
   // Com 5 visões não cabe no celular: rola dentro de si em vez de empurrar a página.
   return (
-    <div role="group" aria-label={label} className="flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-tier-3 p-0.5">
+    <div role="group" aria-label={label} className="flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-tier-3 p-0.5 [scrollbar-width:none]">
       {options.map((o) => {
         const active = o.value === value;
         return (
