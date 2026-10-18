@@ -23,12 +23,18 @@ export default async function ComparePage({ params }: { params: Promise<{ id: st
   // Trava: nunca compara times de ligas/temporadas diferentes (ex.: Real Madrid x Palmeiras).
   if (!b || otherId === teamId || !canCompare(a, b)) {
     return (
-      <div className="rounded-xl border border-weak bg-weak-bg p-6 text-weak">
-        <p className="font-bold">Comparação indisponível</p>
+      // Aviso, não erro: âmbar em vez de vermelho.
+      <div className="rounded-[14px] border border-brand-amber bg-brand-amber-soft p-6 text-brand-amber-ink">
+        <p className="font-display text-lg font-bold uppercase">Comparação indisponível</p>
         <p className="mt-1 text-sm">
           Só dá para comparar {a.teamName} com times do {a.leagueName} {a.season}.
         </p>
-        <Link href={`/time/${a.teamId}`} className="mt-3 inline-block text-accent">Ver o painel de {a.teamName}</Link>
+        <Link
+          href={`/time/${a.teamId}`}
+          className="mt-3 inline-block rounded font-bold underline underline-offset-2 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-teal"
+        >
+          Ver o painel de {a.teamName}
+        </Link>
       </div>
     );
   }

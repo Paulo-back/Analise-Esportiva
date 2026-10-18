@@ -4,7 +4,7 @@ export function Crest({ src, alt, size = 24 }: { src: string | null; alt: string
     return (
       <span
         aria-hidden
-        className="inline-block rounded-full bg-card-inner"
+        className="inline-block rounded-full bg-tier-3"
         style={{ width: size, height: size }}
       />
     );
