@@ -1,21 +1,31 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Outfit } from "next/font/google";
+import { Barlow, Barlow_Condensed } from "next/font/google";
 import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import "./globals.css";
 
-const outfit = Outfit({ subsets: ["latin", "latin-ext"], variable: "--font-outfit" });
+const barlow = Barlow({
+  subsets: ["latin", "latin-ext"], weight: ["400", "500", "600", "700"], variable: "--font-barlow",
+});
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin", "latin-ext"], weight: ["600", "700", "800"], variable: "--font-barlow-condensed",
+});
 
 export const metadata = { title: BRAND_NAME, description: BRAND_TAGLINE };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" className={outfit.variable}>
+    <html lang="pt-BR" className={`${barlow.variable} ${barlowCondensed.variable}`}>
       <body className="flex min-h-screen flex-col">
-        <header className="border-b border-line px-4 py-3">
-          <Link href="/" className="text-lg font-bold tracking-wide text-accent">
-            {BRAND_NAME}
-          </Link>
+        <header className="border-b border-band-line bg-band">
+          <div className="mx-auto w-full max-w-7xl px-4 py-3">
+            <Link
+              href="/"
+              className="rounded font-display text-xl font-extrabold uppercase tracking-wide text-brand-gradient focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-teal"
+            >
+              {BRAND_NAME}
+            </Link>
+          </div>
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">{children}</main>
         <footer className="px-4 py-4 text-center text-xs text-muted">

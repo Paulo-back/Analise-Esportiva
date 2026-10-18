@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #140a3d;
-  --color-card: #2a12a8;
-  --color-card-inner: #3318b8;
-  --color-line: #4a33e0;
-  --color-fg: #ffffff;
-  --color-muted: #a99ff0;
-  --color-accent: #c8f31d;
-  --color-strong: #9ff0c0;
-  --color-strong-bg: #1f6b3a;
-  --color-weak: #ffb3bf;
-  --color-weak-bg: #6b1f2c;
-  --font-sans: var(--font-outfit);
+  --color-page: #f2f6f6;
+  --color-surface: #ffffff;
+  --color-line: #dbe6e7;
+  --color-fg: #071317;
+  --color-muted: #56706f;
+  --color-band: #071317;
+  --color-band-line: #1c343a;
+  --color-band-muted: #6f8a8e;
+  --color-brand-teal: #02a0a0;
+  --color-brand-teal-ink: #017a7a;
+  --color-brand-amber: #ffbd65;
+  --color-brand-amber-ink: #b45309;
+  --color-brand-amber-soft: #fff4e3;
+  --color-team-a: #02a0a0;
+  --color-team-b: #f59e2b;
+  /* Escala da nota (scoreTier): 5 = forte … 1 = fraco. Pares fundo/texto com contraste ≥ 4,5:1. */
+  --color-tier-5: #15803d;
+  --color-tier-5-fg: #ffffff;
+  --color-tier-4: #d3f5df;
+  --color-tier-4-fg: #0f5f30;
+  --color-tier-3: #edf2f2;
+  --color-tier-3-fg: #071317;
+  --color-tier-2: #fde0de;
+  --color-tier-2-fg: #9b1c1c;
+  --color-tier-1: #dc2626;
+  --color-tier-1-fg: #ffffff;
+  --font-sans: var(--font-barlow);
+  --font-display: var(--font-barlow-condensed);
+
+  /* Apelidos temporários dos nomes antigos, para o site não quebrar no meio do redesign. Sair na Tarefa 7. */
+  --color-bg: var(--color-page);
+  --color-card: var(--color-surface);
+  --color-card-inner: var(--color-tier-3);
+  --color-accent: var(--color-brand-teal-ink);
+  --color-strong: var(--color-tier-4-fg);
+  --color-strong-bg: var(--color-tier-4);
+  --color-weak: var(--color-tier-2-fg);
+  --color-weak-bg: var(--color-tier-2);
+}
+
+@utility bg-brand-gradient {
+  background-image: linear-gradient(90deg, var(--color-brand-amber), var(--color-brand-teal));
+}
+
+@utility text-brand-gradient {
+  background-image: linear-gradient(90deg, var(--color-brand-amber), var(--color-brand-teal));
+  background-clip: text;
+  color: transparent;
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background: var(--color-bg);
+  background: var(--color-page);
   color: var(--color-fg);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
