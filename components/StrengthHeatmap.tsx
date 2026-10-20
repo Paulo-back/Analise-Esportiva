@@ -3,9 +3,9 @@ import { TIER_CLASS } from "@/components/tierClass";
 import { DIMENSION_LABELS, JUDGED_DIMENSIONS, scoreTier, type DimensionScores } from "@/lib/profile";
 import type { JudgedDimension } from "@/lib/types";
 
-// Cabeçalho curto no celular, para as 5 colunas caberem sem rolar.
+// Cabeçalho curto no celular, para as 6 colunas caberem sem rolar.
 const SHORT_LABELS: Record<JudgedDimension, string> = {
-  attack: "Ata", defense: "Def", intensity: "Int", set_piece: "BP", discipline: "Dis",
+  dominance: "Dom", attack: "Ata", defense: "Def", intensity: "Int", set_piece: "BP", discipline: "Dis",
 };
 
 const LEGEND = ["bg-tier-1", "bg-tier-2", "bg-tier-3", "bg-tier-4", "bg-tier-5"];

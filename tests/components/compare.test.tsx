@@ -29,6 +29,14 @@ describe("compareWinner", () => {
     expect(compareWinner("goals_for", null, 1)).toBeNull();
   });
 
+  it("eficiência, faltas e desarmes não têm vencedor; saldo maior é melhor", () => {
+    expect(compareWinner("conversion_pct", 40, 20)).toBeNull();
+    expect(compareWinner("goals_minus_xg", 0.4, -0.2)).toBeNull();
+    expect(compareWinner("fouls", 10, 14)).toBeNull();
+    expect(compareWinner("tackles_interceptions", 30, 20)).toBeNull();
+    expect(compareWinner("xg_diff", -0.3, 0.5)).toBe("b");
+  });
+
   it("xG sofrido e gols sofridos por tempo: menor é melhor", () => {
     expect(compareWinner("xg_against", 1.4, 0.9)).toBe("b");
     expect(compareWinner("goals_against_1h", 1.0, 0.68)).toBe("b");
@@ -49,6 +57,14 @@ describe("RivalSelect", () => {
 });
 
 describe("CompareDashboard", () => {
+  it("não mostra o perfil dos gols, que fica só no painel do time", () => {
+    const base = team(10, "Palmeiras", 1.78, 0.63);
+    const rows = [...base.byVenue.all, row("bench_goals_pct", "goal_profile", 20, 50)];
+    const a = { ...base, byVenue: { ...base.byVenue, all: rows } };
+    render(<CompareDashboard a={a} b={team(11, "Flamengo", 2.04, 0.74)} rivals={[]} />);
+    expect(screen.queryByText("Gols de quem saiu do banco")).not.toBeInTheDocument();
+  });
+
   it("mostra os dois lados com média (total)", () => {
     render(
       <CompareDashboard a={team(10, "Palmeiras", 1.78, 0.63)} b={team(11, "Flamengo", 2.04, 0.74)}
@@ -80,7 +96,7 @@ describe("MirrorBar", () => {
 
 describe("placar de dimensões", () => {
   const s = (attack: number | null, defense: number | null) =>
-    ({ attack, defense, intensity: null, set_piece: null, discipline: null });
+    ({ dominance: null, attack, defense, intensity: null, set_piece: null, discipline: null });
 
   it("conta só dimensões com as duas notas e diferentes", () => {
     expect(dimensionTally(s(80, 40), s(60, 40))).toEqual({ a: 1, b: 0, total: 1 });

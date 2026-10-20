@@ -1,9 +1,11 @@
 // "venue" é o recorte: geral, casa, fora e os dois turnos (metade das rodadas).
 export type Venue = "all" | "home" | "away" | "turn_1" | "turn_2";
 export type Dimension =
-  | "attack" | "defense" | "intensity" | "set_piece" | "discipline" | "style" | "timing";
-// style e timing são informativos: sem percentil e fora das notas.
-export type JudgedDimension = Exclude<Dimension, "style" | "timing">;
+  | "dominance" | "attack" | "defense" | "intensity" | "set_piece" | "discipline"
+  | "style" | "timing" | "efficiency" | "goal_profile";
+// Informativas: sem percentil e fora das notas.
+export type InformativeDimension = "style" | "timing" | "efficiency" | "goal_profile";
+export type JudgedDimension = Exclude<Dimension, InformativeDimension>;
 
 export interface MetricRow {
   metric: string;
@@ -36,6 +38,14 @@ export interface TeamProfile extends TeamRef {
   leagueName: string;
   season: number;
   byVenue: Record<Venue, MetricRow[]>;
+}
+
+// Artilheiro do time num recorte (pipeline: team_top_scorers); teamGoals inclui gol contra a favor.
+export interface TopScorer {
+  rank: number;
+  playerName: string;
+  goals: number;
+  teamGoals: number;
 }
 
 export interface LeagueTeamProfile extends TeamRef {

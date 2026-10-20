@@ -78,6 +78,37 @@ describe("TeamDashboard — dados de tempo de jogo", () => {
     expect(screen.getByText("6 · 2")).toBeInTheDocument(); // 76-90
   });
 
+  it("mostra artilheiro, gols do banco, intervalo e eficiência da visão escolhida", () => {
+    function pct(metric: string, dimension: MetricRow["dimension"], num: number, den: number, leagueAvg: number): MetricRow {
+      return {
+        metric, dimension, value: (num / den) * 100, total: null, numerator: num, denominator: den,
+        leagueAvg, percentile: null, gamesCounted: 10,
+      };
+    }
+    const rows = [
+      goals(1.5, 20, 80),
+      pct("bench_goals_pct", "goal_profile", 6, 30, 14),
+      pct("ht_lead_points_pct", "goal_profile", 27, 30, 80),
+      pct("conversion_pct", "efficiency", 30, 90, 30),
+    ];
+    const withProfile: TeamProfile = { ...profile, byVenue: { ...profile.byVenue, all: rows } };
+    const scorers = {
+      all: [{ rank: 1, playerName: "Vitor Roque", goals: 12, teamGoals: 30 }],
+      home: [{ rank: 1, playerName: "Flaco López", goals: 5, teamGoals: 18 }],
+      away: [], turn_1: [], turn_2: [],
+    };
+    render(<TeamDashboard profile={withProfile} standing={null} months={[]} scorers={scorers} rivals={[]} />);
+
+    expect(screen.getByText("Vitor Roque")).toBeInTheDocument();
+    expect(screen.getByText("12 de 30 · 40%")).toBeInTheDocument();
+    expect(screen.getByText("20% (6/30)")).toBeInTheDocument();
+    expect(screen.getByText("90% (27/30)")).toBeInTheDocument();
+    expect(screen.getByText("33% (30/90)")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Casa" }));
+    expect(screen.getByText("Flaco López")).toBeInTheDocument();
+  });
+
   it("avisa quando o minuto dos gols ainda não chegou", () => {
     render(<TeamDashboard profile={profile} standing={null} months={[]} rivals={[]} />);
     expect(screen.getByText(/Minuto dos gols ainda sendo carregado/)).toBeInTheDocument();

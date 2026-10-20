@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { TeamDashboard } from "@/components/TeamDashboard";
 import { UpdatedAt } from "@/components/UpdatedAt";
 import {
-  getComputedAt, getLeagueProfiles, getStandings, getTeamGoalsByMonth, getTeamProfile,
+  getComputedAt, getLeagueProfiles, getStandings, getTeamGoalsByMonth, getTeamProfile, getTeamTopScorers,
 } from "@/lib/queries";
 
 export const revalidate = 3600;
@@ -18,9 +18,10 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   const profile = await getTeamProfile(teamId);
   if (!profile) notFound();
 
-  const [standings, months, leagueProfiles, computedAt] = await Promise.all([
+  const [standings, months, scorers, leagueProfiles, computedAt] = await Promise.all([
     getStandings(profile.leagueId, profile.season),
     getTeamGoalsByMonth(teamId, profile.leagueId, profile.season),
+    getTeamTopScorers(teamId, profile.leagueId, profile.season),
     getLeagueProfiles(profile.leagueId, profile.season, "all"),
     getComputedAt(),
   ]);
@@ -34,6 +35,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
         profile={profile}
         standing={standings.find((s) => s.teamId === teamId) ?? null}
         months={months}
+        scorers={scorers}
         rivals={rivals}
       />
       <UpdatedAt date={computedAt} />

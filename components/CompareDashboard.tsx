@@ -8,7 +8,8 @@ import { MirrorBar } from "@/components/MirrorBar";
 import { RivalSelect } from "@/components/RivalSelect";
 import { Segmented } from "@/components/Segmented";
 import {
-  DIMENSION_LABELS, JUDGED_DIMENSIONS, METRIC_INFO, VENUE_LABELS, dimensionScores, formatMetric, metricLabel, pickRows,
+  DIMENSION_LABELS, EFFICIENCY_METRICS, JUDGED_DIMENSIONS, METRIC_INFO, VENUE_LABELS, dimensionScores, formatMetric,
+  metricLabel, pickRows,
   type DimensionScores,
 } from "@/lib/profile";
 import type { Dimension, TeamProfile, TeamRef, Venue } from "@/lib/types";
@@ -16,15 +17,20 @@ import type { Dimension, TeamProfile, TeamRef, Venue } from "@/lib/types";
 // Mesma direção do pipeline (pipeline/team_profiles.py METRICS): -1 = menor é melhor.
 const LOWER_IS_BETTER = new Set([
   "goals_against", "shots_on_goal_against", "dribbled_past", "penalties_committed",
-  "fouls", "yellow_cards", "red_cards", "xg_against", "goals_against_1h", "goals_against_2h",
+  "yellow_cards", "red_cards", "xg_against", "goals_against_1h", "goals_against_2h",
 ]);
-const STYLE = new Set(["possession_pct", "passes_total", "passes_accuracy_pct", "offsides"]);
+// Estilo e eficiência não têm vencedor: não dizem quem é melhor (ver pipeline, direção 0).
+const NO_WINNER = new Set([
+  "possession_pct", "passes_total", "passes_accuracy_pct", "offsides", "tackles_interceptions", "fouls",
+  ...EFFICIENCY_METRICS,
+]);
 
 const VENUE_OPTIONS = (Object.keys(VENUE_LABELS) as Venue[]).map((v) => ({ value: v, label: VENUE_LABELS[v] }));
-const GROUP_ORDER: Dimension[] = [...JUDGED_DIMENSIONS, "style", "timing"];
+// Perfil dos gols fica só no painel do time.
+const GROUP_ORDER: Dimension[] = [...JUDGED_DIMENSIONS, "efficiency", "style", "timing"];
 
 export function compareWinner(metric: string, a: number | null, b: number | null): "a" | "b" | null {
-  if (a === null || b === null || a === b || STYLE.has(metric)) return null;
+  if (a === null || b === null || a === b || NO_WINNER.has(metric)) return null;
   const aBetter = LOWER_IS_BETTER.has(metric) ? a < b : a > b;
   return aBetter ? "a" : "b";
 }
@@ -125,7 +131,7 @@ export function CompareDashboard({ a, b, rivals }: { a: TeamProfile; b: TeamProf
         })}
       </Card>
 
-      <Card title="Métricas" subtitle="média por jogo (total) · cor cheia = melhor da linha · estilo sem vencedor">
+      <Card title="Métricas" subtitle="média por jogo (total) · cor cheia = melhor da linha · estilo e eficiência sem vencedor">
         {groups.map((g) => (
           <div key={g.dimension} className="mt-3 first:mt-0">
             <p className="mb-1 font-display text-xs font-bold uppercase tracking-wide text-muted">{DIMENSION_LABELS[g.dimension]}</p>

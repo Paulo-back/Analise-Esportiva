@@ -8,6 +8,7 @@ import type {
   StandingRow,
   TeamMonthGoals,
   TeamProfile,
+  TopScorer,
   Venue,
 } from "@/lib/types";
 
@@ -231,4 +232,27 @@ export async function getTeamProfile(teamId: number): Promise<TeamProfile | null
     season: Number(first.season),
     byVenue,
   };
+}
+
+export async function getTeamTopScorers(
+  teamId: number,
+  leagueId: number,
+  season: number
+): Promise<Record<Venue, TopScorer[]>> {
+  const { rows } = await pool.query(
+    `SELECT venue, rank, player_name, goals, team_goals FROM team_top_scorers
+     WHERE team_id = $1 AND league_id = $2 AND season = $3
+     ORDER BY venue, rank`,
+    [teamId, leagueId, season]
+  );
+  const byVenue: Record<Venue, TopScorer[]> = { all: [], home: [], away: [], turn_1: [], turn_2: [] };
+  for (const r of rows) {
+    byVenue[r.venue as Venue].push({
+      rank: Number(r.rank),
+      playerName: (r.player_name as string | null) ?? "—",
+      goals: Number(r.goals),
+      teamGoals: Number(r.team_goals),
+    });
+  }
+  return byVenue;
 }

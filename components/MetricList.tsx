@@ -1,5 +1,5 @@
 import { PercentileBar } from "@/components/PercentileBar";
-import { DIMENSION_LABELS, JUDGED_DIMENSIONS, METRIC_INFO, formatMetric, metricLabel } from "@/lib/profile";
+import { DIMENSION_LABELS, JUDGED_DIMENSIONS, METRIC_INFO, formatMetric, isJudged, metricLabel } from "@/lib/profile";
 import type { MetricRow } from "@/lib/types";
 
 function MetricLine({ row }: { row: MetricRow }) {
@@ -16,7 +16,8 @@ function MetricLine({ row }: { row: MetricRow }) {
 }
 
 export function MetricList({ rows }: { rows: MetricRow[] }) {
-  const judged = rows.filter((r) => r.dimension !== "style" && r.dimension !== "timing");
+  // Eficiência e perfil dos gols têm cards próprios no painel do time; tempo de jogo vira gráfico.
+  const judged = rows.filter((r) => isJudged(r.dimension));
   const style = rows.filter((r) => r.dimension === "style");
   const byDimension = (list: MetricRow[]) =>
     JUDGED_DIMENSIONS.map((d) => [d, list.filter((r) => r.dimension === d)] as const).filter(([, l]) => l.length);

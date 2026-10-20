@@ -4,18 +4,20 @@ import {
   type DimensionScores as Scores,
 } from "@/lib/profile";
 
-// Alinha o balão pela coluna do grid (2 colunas no celular, 5 a partir de sm) pra não vazar da tela.
+// Alinha o balão pela coluna do grid (2 colunas no celular, 3 a partir de sm, 6 a partir de xl)
+// pra não vazar da tela: coluna da esquerda abre pra direita, da direita pra esquerda.
 const TOOLTIP_POSITION = [
   "left-0",
   "right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2",
+  "left-0 sm:left-auto sm:right-0 xl:right-auto xl:left-1/2 xl:-translate-x-1/2",
+  "right-0 sm:right-auto sm:left-0 xl:left-1/2 xl:-translate-x-1/2",
   "left-0 sm:left-1/2 sm:-translate-x-1/2",
-  "right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2",
-  "left-0 sm:left-auto sm:right-0",
+  "right-0",
 ];
 
 export function DimensionScores({ scores }: { scores: Scores }) {
   return (
-    <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-5 lg:auto-rows-fr">
+    <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6 lg:auto-rows-fr">
       {JUDGED_DIMENSIONS.map((d, i) => {
         const score = scores[d];
         const tier = scoreTier(score);

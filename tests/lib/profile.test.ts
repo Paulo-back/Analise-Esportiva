@@ -28,9 +28,18 @@ function row(partial: Partial<MetricRow> & Pick<MetricRow, "metric">): MetricRow
 }
 
 describe("METRIC_INFO", () => {
-  it("cobre as 32 métricas do pipeline que aparecem em lista", () => {
-    // 25 originais + 3 de xG + 4 de gols por tempo; as 12 faixas de minuto só aparecem no gráfico.
-    expect(Object.keys(METRIC_INFO)).toHaveLength(32);
+  it("cobre as 42 métricas do pipeline que aparecem em lista ou card", () => {
+    // 25 originais + 3 de xG + 4 de gols por tempo + 3 saldos + 2 de gols x xG + 5 de perfil dos gols;
+    // as 12 faixas de minuto só aparecem no gráfico.
+    expect(Object.keys(METRIC_INFO)).toHaveLength(42);
+  });
+});
+
+describe("formatMetric com saldo", () => {
+  it("mostra sinal em saldo positivo e negativo", () => {
+    expect(formatMetric(row({ metric: "goal_diff", value: 0.5, total: 10 }))).toBe("+0,50 (+10)");
+    expect(formatMetric(row({ metric: "xg_diff", value: -0.32, total: null }))).toBe("-0,32");
+    expect(formatMetric(row({ metric: "goals_for", value: 1.5, total: 30 }))).toBe("1,50 (30)");
   });
 });
 
@@ -85,7 +94,7 @@ describe("scoreTier", () => {
 describe("standingsHighlights", () => {
   it("devolve a melhor e a pior dimensão com nota e faixa, mesmo no meio da escala", () => {
     expect(
-      standingsHighlights({ attack: 51, defense: 39, intensity: 68, set_piece: 58, discipline: 36 })
+      standingsHighlights({ dominance: null, attack: 51, defense: 39, intensity: 68, set_piece: 58, discipline: 36 })
     ).toEqual({
       best: { dimension: "intensity", score: 68, tier: "good" },
       worst: { dimension: "discipline", score: 36, tier: "poor" },
@@ -93,7 +102,7 @@ describe("standingsHighlights", () => {
   });
   it("ignora dimensões sem nota", () => {
     expect(
-      standingsHighlights({ attack: 80, defense: null, intensity: 50, set_piece: 10, discipline: null })
+      standingsHighlights({ dominance: null, attack: 80, defense: null, intensity: 50, set_piece: 10, discipline: null })
     ).toEqual({
       best: { dimension: "attack", score: 80, tier: "strong" },
       worst: { dimension: "set_piece", score: 10, tier: "weak" },
@@ -101,12 +110,12 @@ describe("standingsHighlights", () => {
   });
   it("só uma dimensão com nota: sem pior, para não repetir a mesma", () => {
     expect(
-      standingsHighlights({ attack: 70, defense: null, intensity: null, set_piece: null, discipline: null })
+      standingsHighlights({ dominance: null, attack: 70, defense: null, intensity: null, set_piece: null, discipline: null })
     ).toEqual({ best: { dimension: "attack", score: 70, tier: "good" }, worst: null });
   });
   it("nenhuma nota: null", () => {
     expect(
-      standingsHighlights({ attack: null, defense: null, intensity: null, set_piece: null, discipline: null })
+      standingsHighlights({ dominance: null, attack: null, defense: null, intensity: null, set_piece: null, discipline: null })
     ).toBeNull();
   });
 });

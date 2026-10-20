@@ -5,6 +5,9 @@ import { useVenueParam } from "@/lib/useVenueParam";
 import { Card } from "@/components/Card";
 import { Crest } from "@/components/Crest";
 import { DimensionScores } from "@/components/DimensionScores";
+import {
+  BenchGoalsCard, EfficiencyCard, GoalOriginCard, HalftimeCard, ScorerDependencyCard,
+} from "@/components/GoalProfileCards";
 import { KpiCard } from "@/components/KpiCard";
 import { MetricList } from "@/components/MetricList";
 import { MonthlyGoalsChart } from "@/components/MonthlyGoalsChart";
@@ -14,7 +17,7 @@ import {
   GOAL_MINUTE_BUCKETS, MIN_GAMES, VENUE_LABELS, dimensionScores, formatMetric, formatMonth, formatNumber,
   hasEnoughSample, pickRows,
 } from "@/lib/profile";
-import type { StandingRow, TeamMonthGoals, TeamProfile, TeamRef, Venue } from "@/lib/types";
+import type { StandingRow, TeamMonthGoals, TeamProfile, TeamRef, TopScorer, Venue } from "@/lib/types";
 
 const VENUE_OPTIONS = (Object.keys(VENUE_LABELS) as Venue[]).map((v) => ({ value: v, label: VENUE_LABELS[v] }));
 
@@ -28,8 +31,11 @@ function leagueHint(row: ReturnType<typeof pickRows>): string | undefined {
 }
 
 export function TeamDashboard({
-  profile, standing, months, rivals,
-}: { profile: TeamProfile; standing: StandingRow | null; months: TeamMonthGoals[]; rivals: TeamRef[] }) {
+  profile, standing, months, scorers, rivals,
+}: {
+  profile: TeamProfile; standing: StandingRow | null; months: TeamMonthGoals[];
+  scorers?: Record<Venue, TopScorer[]>; rivals: TeamRef[];
+}) {
   const [venue, setVenue] = useVenueParam("visao");
   const rows = profile.byVenue[venue];
   const enough = hasEnoughSample(rows);
@@ -135,6 +141,12 @@ export function TeamDashboard({
             <p className="text-sm text-muted">Minuto dos gols ainda sendo carregado nesta visão.</p>
           )}
         </Card>
+
+        <ScorerDependencyCard className="lg:col-span-5" scorers={scorers?.[venue] ?? []} />
+        <BenchGoalsCard className="lg:col-span-3" rows={rows} />
+        <GoalOriginCard className="lg:col-span-4" rows={rows} />
+        <HalftimeCard className="lg:col-span-5" rows={rows} />
+        <EfficiencyCard className="lg:col-span-7" rows={rows} />
       </div>
     </div>
   );

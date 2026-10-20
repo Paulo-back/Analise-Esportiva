@@ -34,7 +34,7 @@ describe("DimensionScores", () => {
   it("mostra a nota arredondada e travessão sem dado", () => {
     render(
       <DimensionScores
-        scores={{ attack: 66.4, defense: 91, intensity: null, set_piece: 79, discipline: 19 }}
+        scores={{ dominance: 55, attack: 66.4, defense: 91, intensity: null, set_piece: 79, discipline: 19 }}
       />
     );
     expect(screen.getByText("66")).toBeInTheDocument();
@@ -44,14 +44,14 @@ describe("DimensionScores", () => {
   it("tem um botão de ajuda por dimensão explicando o cálculo", () => {
     render(
       <DimensionScores
-        scores={{ attack: 66, defense: 91, intensity: null, set_piece: 79, discipline: 19 }}
+        scores={{ dominance: null, attack: 66, defense: 91, intensity: null, set_piece: 79, discipline: 19 }}
       />
     );
     const button = screen.getByRole("button", { name: "Como é calculado: Ataque" });
     const tooltipId = button.getAttribute("aria-describedby");
     expect(tooltipId).toBeTruthy();
     expect(document.getElementById(tooltipId as string)).toHaveTextContent(/gols pró/i);
-    expect(screen.getAllByRole("button", { name: /^Como é calculado:/ })).toHaveLength(5);
+    expect(screen.getAllByRole("button", { name: /^Como é calculado:/ })).toHaveLength(6);
   });
 });
 

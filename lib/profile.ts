@@ -11,11 +11,17 @@ export const VENUE_LABELS: Record<Venue, string> = {
   all: "Geral", home: "Casa", away: "Fora", turn_1: "1º turno", turn_2: "2º turno",
 };
 
+// Domínio primeiro: saldos foram o que mais previu pontos no teste do pipeline (1ª x 2ª metade).
 export const JUDGED_DIMENSIONS: JudgedDimension[] = [
-  "attack", "defense", "intensity", "set_piece", "discipline",
+  "dominance", "attack", "defense", "intensity", "set_piece", "discipline",
 ];
 
+export function isJudged(dimension: Dimension): dimension is JudgedDimension {
+  return (JUDGED_DIMENSIONS as Dimension[]).includes(dimension);
+}
+
 export const DIMENSION_LABELS: Record<Dimension, string> = {
+  dominance: "Domínio",
   attack: "Ataque",
   defense: "Defesa",
   intensity: "Intensidade",
@@ -23,19 +29,27 @@ export const DIMENSION_LABELS: Record<Dimension, string> = {
   discipline: "Disciplina",
   style: "Estilo",
   timing: "Tempo de jogo",
+  efficiency: "Eficiência",
+  goal_profile: "Perfil dos gols",
 };
 
 // Texto do "!" de cada nota; manter em sincronia com METRICS em pipeline/team_profiles.py.
 export const DIMENSION_HELP: Record<JudgedDimension, string> = {
+  dominance:
+    "Média dos percentis de saldo de gols, saldo de xG e saldo de chutes no gol por jogo: o quanto o time cria a mais do que cede. É a dimensão que melhor antecipa a campanha.",
   attack:
-    "Média dos percentis de gols pró, xG (gols esperados), chutes, chutes no gol, chutes de dentro da área, conversão, passes-chave, dribles certos e pênaltis sofridos.",
+    "Média dos percentis de gols pró, xG (gols esperados), chutes, chutes no gol, chutes de dentro da área, passes-chave, dribles certos e pênaltis sofridos.",
   defense:
-    "Média dos percentis de gols sofridos, xG sofrido, gols evitados pelo goleiro, chutes no gol sofridos, vezes driblado, pênaltis cometidos, jogos sem sofrer gol, desarmes + interceptações, bloqueios e defesas do goleiro. Onde menos é melhor, a escala é invertida.",
+    "Média dos percentis de gols sofridos, xG sofrido, chutes no gol sofridos, vezes driblado, pênaltis cometidos, jogos sem sofrer gol e bloqueios. Onde menos é melhor, a escala é invertida.",
   intensity: "Percentil da porcentagem de duelos ganhos.",
   set_piece: "Percentil de escanteios por jogo.",
   discipline:
-    "Média dos percentis de faltas, amarelos e vermelhos. Menos é melhor: quem comete menos fica com nota maior.",
+    "Média dos percentis de amarelos e vermelhos. Menos é melhor: quem leva menos cartão fica com nota maior.",
 };
+
+// Card de eficiência: números que oscilam muito de um período para o outro.
+export const EFFICIENCY_HELP =
+  "Fora da nota: conversão, defesas e gols x xG mudam muito de uma metade da temporada para a outra. Muito acima da liga costuma não se sustentar.";
 
 export const PERCENTILE_HELP =
   "Percentil = posição entre os times da mesma liga (0 a 100; 50 é a mediana). Só entram métricas com pelo menos 5 jogos.";
@@ -43,8 +57,11 @@ export const PERCENTILE_HELP =
 // mean = média em porcentagem (posse); decimal = média com 2 casas (xG).
 type MetricKind = "count" | "mean" | "pct" | "decimal";
 
-// featured = aparece sem precisar expandir "ver todas" no painel do time.
-export const METRIC_INFO: Record<string, { label: string; kind: MetricKind; featured: boolean }> = {
+// featured = aparece sem precisar expandir "ver todas" no painel do time; signed = saldo (+/−).
+export const METRIC_INFO: Record<string, { label: string; kind: MetricKind; featured: boolean; signed?: boolean }> = {
+  goal_diff: { label: "Saldo de gols", kind: "count", featured: true, signed: true },
+  xg_diff: { label: "Saldo de xG", kind: "decimal", featured: true, signed: true },
+  shots_on_goal_diff: { label: "Saldo de chutes no gol", kind: "count", featured: true, signed: true },
   goals_for: { label: "Gols pró", kind: "count", featured: true },
   shots_total: { label: "Chutes", kind: "count", featured: false },
   shots_on_goal: { label: "Chutes no gol", kind: "count", featured: true },
@@ -77,7 +94,18 @@ export const METRIC_INFO: Record<string, { label: string; kind: MetricKind; feat
   goals_for_2h: { label: "Gols pró no 2º tempo", kind: "count", featured: false },
   goals_against_1h: { label: "Gols sofridos no 1º tempo", kind: "count", featured: false },
   goals_against_2h: { label: "Gols sofridos no 2º tempo", kind: "count", featured: false },
+  goals_minus_xg: { label: "Gols pró − xG", kind: "decimal", featured: false, signed: true },
+  xg_against_minus_goals_against: { label: "xG sofrido − gols sofridos", kind: "decimal", featured: false, signed: true },
+  bench_goals_pct: { label: "Gols de quem saiu do banco", kind: "pct", featured: false },
+  penalty_goals_pct: { label: "Gols de pênalti", kind: "pct", featured: false },
+  own_goals_for_pct: { label: "Gols contra a favor", kind: "pct", featured: false },
+  ht_lead_points_pct: { label: "Aproveitamento vencendo no intervalo", kind: "pct", featured: false },
+  ht_trail_points_pct: { label: "Aproveitamento perdendo no intervalo", kind: "pct", featured: false },
 };
+
+export const EFFICIENCY_METRICS = [
+  "conversion_pct", "save_pct", "goals_prevented", "goals_minus_xg", "xg_against_minus_goals_against",
+];
 
 // Faixas de minuto dos gols (métricas goals_for_min_* / goals_against_min_* do pipeline).
 export const GOAL_MINUTE_BUCKETS = [
@@ -156,25 +184,27 @@ export function pickRows(rows: MetricRow[], metric: string): MetricRow | undefin
   return rows.find((r) => r.metric === metric);
 }
 
-export function formatNumber(n: number, digits: number): string {
+export function formatNumber(n: number, digits: number, signed = false): string {
   return new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
+    signDisplay: signed ? "exceptZero" : "auto",
   }).format(n);
 }
 
 export function formatMetric(row: MetricRow): string {
   if (row.value === null) return "—";
   const kind = METRIC_INFO[row.metric]?.kind ?? "count";
+  const signed = METRIC_INFO[row.metric]?.signed ?? false;
   if (kind === "pct") {
     const base = `${formatNumber(row.value, 0)}%`;
     if (row.numerator === null || row.denominator === null) return base;
     return `${base} (${formatNumber(row.numerator, 0)}/${formatNumber(row.denominator, 0)})`;
   }
   if (kind === "mean") return `${formatNumber(row.value, 0)}%`;
-  if (kind === "decimal") return formatNumber(row.value, 2);
-  const avg = formatNumber(row.value, 2);
-  return row.total === null ? avg : `${avg} (${formatNumber(row.total, 0)})`;
+  if (kind === "decimal") return formatNumber(row.value, 2, signed);
+  const avg = formatNumber(row.value, 2, signed);
+  return row.total === null ? avg : `${avg} (${formatNumber(row.total, 0, signed)})`;
 }
 
 const MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];

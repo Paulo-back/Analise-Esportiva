@@ -67,7 +67,7 @@ describe("StrengthHeatmap", () => {
   it("mostra as notas por dimensão", () => {
     render(
       <StrengthHeatmap
-        teams={[{ teamId: 1, teamName: "Palmeiras", scores: { attack: 66, defense: 91, intensity: null, set_piece: 79, discipline: 19 } }]}
+        teams={[{ teamId: 1, teamName: "Palmeiras", scores: { dominance: null, attack: 66, defense: 91, intensity: null, set_piece: 79, discipline: 19 } }]}
       />
     );
     expect(screen.getByText("91")).toBeInTheDocument();
